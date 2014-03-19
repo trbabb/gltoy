@@ -1,0 +1,10 @@
+uniform mat4 camOrient;
+
+attribute float ptSize;
+varying float ptSize_v;
+
+void main(){
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+	gl_Position = gl_Vertex;
+	ptSize_v = ptSize * 0.25;
+}
