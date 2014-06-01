@@ -54,6 +54,8 @@ public:
 	//  - special: was the keystroke a non-ascii key?
 	//  - x, y: position of the mouse cursor when the key was struck. +y is up.
 	virtual bool keyEvent(GLWindow* window, unsigned char key, int keycode, bool down, bool special, int x, int y);
+    
+    virtual bool windowReshaped(GLWindow *window, int w_new, int h_new);
 };
 
 class PickListener {

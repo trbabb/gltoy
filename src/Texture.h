@@ -19,7 +19,7 @@
 #define TEXTURE_H_
 
 #include <boost/shared_ptr.hpp>
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include <sstream>
 
 #include "GLTypeInfo.h"

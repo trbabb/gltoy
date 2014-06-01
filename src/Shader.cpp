@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdio>
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include "Shader.h"
 
 using namespace std;

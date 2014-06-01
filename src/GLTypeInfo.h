@@ -8,7 +8,7 @@
 #ifndef GLTYPEINFO_H_
 #define GLTYPEINFO_H_
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 
 /*************************
  * Type Info Helper      *

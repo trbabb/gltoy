@@ -11,6 +11,7 @@
 #include <geomc/linalg/Vec.h>
 
 // TODO: get cam matrices.
+// TODO: this shit is cumbersome and I don't like it.
 
 using namespace geom;
 
@@ -44,9 +45,9 @@ public:
     ProjectionMode getProjectionMode() const;
     void   setOrthoWidth(double orthoWidth);
     double getOrthoWidth() const;
-    void setUp(Vec3d up);
-    Vec3d getUp() const;
-    void setFov(double fov);
+    void   setUp(Vec3d up);
+    Vec3d  getUp() const;
+    void   setFov(double fov);
     double getFov() const;
     
     

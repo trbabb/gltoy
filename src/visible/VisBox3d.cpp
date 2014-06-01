@@ -5,7 +5,7 @@
  *      Author: tbabb
  */
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include "VisBox3d.h"
 #include <geomc/linalg/Vec.h>
 

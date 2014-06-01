@@ -6,7 +6,7 @@
  */
 
 #include <iostream>
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
 
@@ -103,12 +103,11 @@ WavBuffer *beginAudio(){
         exit(1);
     }
     
-    Mix_RegisterEffect(MIX_CHANNEL_POST, &effectCallback, NULL, wbuf);
-    
     musicObj = Mix_LoadMUS("/Users/tbabb/test/fishes.flac");
     if (musicObj == 0){
         std::cout << "Couldn't load music file." << std::endl;
     }
+    Mix_RegisterEffect(MIX_CHANNEL_POST, &effectCallback, NULL, wbuf);
     Mix_PlayMusic(musicObj, 0);
     
     //DEBUG FIXME: sound off

@@ -22,7 +22,7 @@
 #ifndef VISSURFACE_H_
 #define VISSURFACE_H_
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 
 #include "boost/shared_ptr.hpp"
 #include <geomc/function/Expr.h>

@@ -38,7 +38,7 @@
 #ifndef RENDERPASS_H_
 #define RENDERPASS_H_
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include <vector>
 
 #include <geomc/linalg/Vec.h>

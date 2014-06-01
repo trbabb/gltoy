@@ -26,7 +26,7 @@
 #ifndef GLWINDOW_H_
 #define GLWINDOW_H_
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include <GLUT/glut.h>
 #include <vector>
 #include <queue>
@@ -85,6 +85,7 @@ public:
 	void redraw();        //this is the one you want to call from elsewhere in the program, calls postRedisplay()
 	void reshape(int ww, int hh);
 	void setClearColor(Vec4d color);
+	inline void setClearColor(Vec3d color) { setClearColor(Vec4d(color,1)); }
 	bool removeObject(Drawable *obj);
 
 	//public static funcs

@@ -30,6 +30,11 @@ bool GUIListener::keyEvent(GLWindow* window, unsigned char key, int keycode, boo
 	return false;
 }
 
+bool GUIListener::windowReshaped(GLWindow* window, int w_new, int h_new) {
+    // do not consume the event
+    return false;
+}
+
 PickListener::PickListener() {}
 
 PickListener::~PickListener() {}

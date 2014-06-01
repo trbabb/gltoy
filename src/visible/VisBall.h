@@ -8,7 +8,7 @@
 #ifndef VISBALL_H_
 #define VISBALL_H_
 
-#include <OpenGL/glu.h>
+#include "glHeaders.h"
 #include "VisBounded.h"
 #include <geomc/linalg/Vec.h>
 

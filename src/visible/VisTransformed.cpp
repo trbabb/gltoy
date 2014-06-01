@@ -6,7 +6,7 @@
  */
 
 #include "VisTransformed.h"
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 
 VisTransformed::VisTransformed(Drawable *obj) : obj(obj) { }
 

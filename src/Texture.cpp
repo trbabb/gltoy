@@ -6,7 +6,7 @@
  */
 
 #include <sstream>
-#include <OpenGL/glu.h>
+#include "glHeaders.h"
 #include "Texture.h"
 
 //TODO: Shader->S=sendTexture(string varname, Texture &t, texNo=0)

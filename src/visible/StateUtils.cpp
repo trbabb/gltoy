@@ -6,7 +6,7 @@
  */
 
 #include "StateUtils.h"
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 
 void glDoSetColor3d(Vec3d c){
     glColor3d(c.x, c.y, c.z);

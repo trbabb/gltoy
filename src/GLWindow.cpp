@@ -130,9 +130,15 @@ void GLWindow::redraw(){
 void GLWindow::reshape(int ww, int hh){
 	w = ww;
 	h = hh;
-	glViewport(0,0,w,h); // if x,y are ever nonzero, unprojectClick will also
-                         // need to be updated.
+	glViewport(0, 0, w, h); // if x,y are ever nonzero, unprojectClick will also
+                            // need to be updated.
     cam.setAspect(w/(double)h);
+    
+    // notify listeners
+    typedef std::vector<GUIListener*>::iterator iter;
+    for (iter i = guiListeners.begin(); i != guiListeners.end(); i++) {
+        if ((*i)->windowReshaped(this, w, h)) break;
+    }
 }
 
 bool GLWindow::removeObject(Drawable *obj){

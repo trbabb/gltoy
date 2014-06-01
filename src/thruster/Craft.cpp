@@ -5,7 +5,7 @@
  *      Author: tbabb
  */
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include "visible/VisBox3d.h"
 #include "Craft.h"
 

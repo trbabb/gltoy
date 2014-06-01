@@ -5,7 +5,7 @@
  *      Author: tbabb
  */
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include "VisPath.h"
 
 VisPath::VisPath():

@@ -15,7 +15,7 @@
 #include <geomc/linalg/Vec.h>
 #include <geomc/linalg/Matrix.h>
 #include <geomc/linalg/AffineTransform.h>
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 
 namespace geom {
 
@@ -33,18 +33,34 @@ inline void glMultMatrix(const SimpleMatrix<float,4,4> &m) {
 	glMultMatrixf(tx.begin());
 }
 
-/////////////// Load Matrix ///////////////
-
-inline void glLoadMatrix(SimpleMatrix<double,4,4> &m) {
-    SimpleMatrix<double,4,4> d;
-    transpose(&d, m);
-    glLoadMatrixd(d.begin());
+inline void glMultMatrix(const AffineTransform<float,3> &xf) {
+    glMultMatrix(xf.mat);
 }
 
-inline void glLoadMatrix(SimpleMatrix<float,4,4> &m) {
-    SimpleMatrix<float,4,4> d;
-    transpose(&d, m);
-    glLoadMatrixf(d.begin());
+inline void glMultMatrix(const AffineTransform<double,3> &xf) {
+    glMultMatrix(xf.mat);
+}
+
+/////////////// Load Matrix ///////////////
+
+inline void glLoadMatrix(const SimpleMatrix<double,4,4> &m) {
+    glLoadTransposeMatrixd(m.begin());
+}
+
+inline void glLoadMatrix(const SimpleMatrix<float,4,4> &m) {
+    glLoadTransposeMatrixf(m.begin());
+}
+
+inline void glLoadMatrix(const Quat<float> &q) {
+    SimpleMatrix<float,4,4> m;
+    rotmat(&m, q);
+    glLoadTransposeMatrixf(m.begin());
+}
+
+inline void glLoadMatrix(const Quat<double> &q) {
+    SimpleMatrix<double,4,4> m;
+    rotmat(&m, q);
+    glLoadTransposeMatrixd(m.begin());
 }
 
 

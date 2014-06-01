@@ -5,7 +5,7 @@
  *      Author: tbabb
  */
 
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include "VisBall.h"
 
 VisBall::VisBall(Vec3d pos, double r, int slices, int stacks):

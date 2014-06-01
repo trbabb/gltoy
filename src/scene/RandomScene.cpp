@@ -1,5 +1,5 @@
 #include <iostream>
-#include <OpenGL/gl.h>
+#include "glHeaders.h"
 #include <algorithm>
 
 #include <geomc/random/RandomTools.h>
