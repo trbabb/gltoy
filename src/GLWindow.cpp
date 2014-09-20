@@ -194,12 +194,12 @@ Vec3d GLWindow::unprojectClickInValidContext(const Vec2d &p,
  * Window state callbacks               *
  ****************************************/
 
-std::tr1::unordered_map<int, GLWindow*> GLWindow::window_objs;
+UMAP_NAMESPACE::unordered_map<int, GLWindow*> GLWindow::window_objs;
 int  GLWindow::mouse_state   = 0;
 
 GLWindow* GLWindow::get_window_obj(){
 	int id = glutGetWindow();
-	std::tr1::unordered_map<int,GLWindow*>::iterator i = window_objs.find(id);
+	UMAP_NAMESPACE::unordered_map<int,GLWindow*>::iterator i = window_objs.find(id);
 	if (i == window_objs.end() || id < 1){
 		return NULL; //current window does not belong to any GLWindows.
 	} else {

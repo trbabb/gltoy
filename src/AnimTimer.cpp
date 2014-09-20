@@ -72,11 +72,11 @@ void AnimTimer::_registerId(){
  * Static Functions/Callbacks/Varaibles *
  ****************************************/
 
-std::tr1::unordered_map<int, AnimTimer*> AnimTimer::timers_by_id;
+AnimTimer::timer_map_t AnimTimer::timers_by_id;
 int AnimTimer::max_id = 1;
 
 AnimTimer* AnimTimer::getTimer(int id){
-	std::tr1::unordered_map<int,AnimTimer*>::iterator i = timers_by_id.find(id);
+	timer_map_t::iterator i = timers_by_id.find(id);
 	if (i == timers_by_id.end()){
 		return NULL;
 	} else {

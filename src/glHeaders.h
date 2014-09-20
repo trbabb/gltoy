@@ -11,7 +11,7 @@
 #ifndef GLTOY_OPENGL_HEADER
 
 #ifdef __APPLE__
-#include "glHeaders.h"
+#include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #include <GLUT/glut.h>
 #else

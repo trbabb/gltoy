@@ -16,7 +16,12 @@
 #ifndef VISRENDERPASSCARD_H_
 #define VISRENDERPASSCARD_H_
 
+#if __cplusplus <= 199711L
 #include <tr1/unordered_map>
+#else
+#include <unordered_map>
+#endif
+
 #include <string>
 #include "VisBounded.h"
 #include "RenderPass.h"
@@ -27,7 +32,11 @@ typedef struct RenderPassOutput {
     int output_id;
 } RenderPassOutput;
 
+#if __cplusplus <= 199711L
 typedef std::tr1::unordered_map<std::string, RenderPassOutput> InputDictionary;
+#else
+typedef std::unordered_map<std::string, RenderPassOutput> InputDictionary;
+#endif
 
 class VisRenderPassCard : virtual public VisBounded<double,3> {
 public:

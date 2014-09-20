@@ -10,7 +10,12 @@
 #ifndef VERTEXBUFFER_H_
 #define VERTEXBUFFER_H_
 
+#if __cplusplus <= 199711L
 #include <tr1/unordered_map>
+#else
+#include <unordered_map>
+#endif
+
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -81,7 +86,11 @@ struct VertexAttribInfo {
 };
 
 
+#if __cplusplus <= 199711L
 typedef std::tr1::unordered_map<std::string, VertexAttribInfo> AttributeMap;
+#else
+typedef std::unordered_map<std::string, VertexAttribInfo> AttributeMap;
+#endif
 
 /*******************************
  * Shared vertex buffer object *

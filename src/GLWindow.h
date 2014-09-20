@@ -32,7 +32,14 @@
 #include <queue>
 #include <string>
 #include <boost/thread.hpp>
+
+#if __cplusplus <= 199711L
 #include <tr1/unordered_map>
+#define UMAP_NAMESPACE std::tr1
+#else
+#include <unordered_map>
+#define UMAP_NAMESPACE std
+#endif
 
 #include <geomc/linalg/Vec.h>
 #include "Camera.h"
@@ -100,7 +107,7 @@ protected:
     void  processPicks();
     
 	//static variables
-	static std::tr1::unordered_map<int, GLWindow*> window_objs;
+	static UMAP_NAMESPACE::unordered_map<int, GLWindow*> window_objs;
 	static int  mouse_state;
 
 	//callbacks
