@@ -6,7 +6,9 @@
  */
 
 #include "glHeaders.h"
+#include "glHelpers.h"
 #include <GLUT/glut.h>
+#include <geomc/linalg/AffineTransform.h>
 #include "Camera.h"
 
 /**********************
@@ -53,7 +55,8 @@ void Camera::use() {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
     Vec3d at = getCenterOfInterest();
-	gluLookAt(position.x, position.y, position.z, at.x, at.y, at.z, up.x, up.y, up.z);
+	//gluLookAt(position.x, position.y, position.z, at.x, at.y, at.z, up.x, up.y, up.z);
+    glMultMatrix(getMatrix());
     
 	inUse = true;
 }
@@ -87,6 +90,23 @@ void Camera::getBillboardMatrix(float modelview[16]) {
 		modelview[i*4 + 3] = 0;
 	}
 	modelview[15] = 1;
+}
+
+
+// world-to-camera matrix
+AffineTransform3d Camera::getMatrix() {
+    AffineTransform3d orient;
+    // prinicpal axes of camera. 
+    // a matrix with these as its columns would make a cam coord in put it in
+    // world coords. we want the opposite.
+    Vec3d z = -direction.unit();
+    Vec3d x = ( up ^ z ).unit();
+    Vec3d y = (  z ^ x ).unit();
+    std::copy(x.begin(), x.end(), orient.mat.row(0));
+    std::copy(y.begin(), y.end(), orient.mat.row(1));
+    std::copy(z.begin(), z.end(), orient.mat.row(2));
+    transpose(&orient.inv, orient.mat);
+    return orient * translation(-position);
 }
 
 

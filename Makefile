@@ -8,7 +8,7 @@ AR = ar
 
 # compile
 INCLUDES = src
-CFLAGS   = -O3 -Wall -c -fmessage-length=0 -Wno-unused -Wno-unused-local-typedefs -Wno-deprecated-declarations -g
+CFLAGS   = -std=c++11 -O3 -Wall -c -fmessage-length=0 -Wno-unused -Wno-unused-local-typedefs -Wno-deprecated-declarations -g
 IFLAGS   = $(addprefix -I, $(INCLUDES))
 
 # link
@@ -39,13 +39,13 @@ clean:
 
 ## binaries
 
-random: $(OBJ) build/scene/random.o
+random: $(OBJ) bindir build/scene/random.o
 	$(CC) $(LDFLAGS) $(OBJ) build/scene/random.o -o bin/random
 
-sound: $(OBJ) build/scene/sound.o
+sound: $(OBJ) bindir build/scene/sound.o
 	$(CC) $(LDFLAGS) $(OBJ) build/scene/sound.o -o bin/sound
 
-occlusion: $(OBJ) build/scene/occlusion.o
+occlusion: $(OBJ) bindir build/scene/occlusion.o
 	$(CC) $(LDFLAGS) $(OBJ) build/scene/occlusion.o -o bin/occlusion
 
 build/scene/random.o : src/scene/RandomScene.cpp
@@ -60,9 +60,13 @@ build/scene/occlusion.o : src/scene/OcclusionScene.cpp
 	mkdir -p build/scene
 	$(CC) $(CFLAGS) $(IFLAGS) -o build/scene/occlusion.o src/scene/OcclusionScene.cpp
 
+bindir:
+	mkdir -p bin
+
 # lib
 
 lib: $(OBJ)
+	mkdir -p lib
 	$(AR) rs $(LIB) $(OBJ)
 	@echo
 	@echo Done building library.

@@ -28,6 +28,7 @@ public:
 	void   use();
 	void   disable();
 	void   getBillboardMatrix(float modelview[16]);
+    AffineTransform3d getMatrix();
     
 	Vec3d  getDirection() const;
     void   setDirection(const Vec3d &v);
