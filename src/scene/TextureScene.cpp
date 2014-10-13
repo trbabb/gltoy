@@ -43,11 +43,11 @@ void splat(Image<float,1> img){
 
 int main(int argc, char** argv){
     GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION);
-    win.cam.at = ZERO_VEC3d;
-    win.cam.pos = X_AXIS3d * 10;
-    win.cam.znear = 0.1;
-    win.cam.zfar  = 200;
-    win.cam.up = Z_AXIS3d;
+    win.cam.setPosition(X_AXIS3d * 10);
+    win.cam.setCenterOfInterest(ZERO_VEC3d);
+    win.cam.setNear(0.1);
+    win.cam.setFar(200);
+    win.cam.setUp(Z_AXIS3d);
     
     Manipulator manip(&win, &win.cam);
     AnimTimer timer(&win);
@@ -70,9 +70,9 @@ int main(int argc, char** argv){
     win.scene.push_back(new VisCallback<int>(&enableAlpha));
     win.scene.push_back(new VisCallback<Vec4d>(&setColor, Vec4d(0.09,1)));
     
-    RandomVectors<double> rv;
+    Sampler<double> smp;
     for (int i = 0; i < 100; i++){
-        VisBall *b = new VisBall(rv.box(-ONE_VEC3d * 100, ONE_VEC3d * 100), rv.rng->rand<double>(0.01,10), 48, 24);
+        VisBall *b = new VisBall(smp.box(-ONE_VEC3d * 100, ONE_VEC3d * 100), smp.rng->rand<double>(0.01,10), 48, 24);
         win.scene.push_back(b);
     }
 

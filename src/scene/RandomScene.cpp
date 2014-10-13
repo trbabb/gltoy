@@ -30,12 +30,12 @@ void setColor(Vec4d c) {
 }
 
 int main(int argc, char** argv) {
-    GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION);
-    win.cam.at = ZERO_VEC3d;
-    win.cam.pos = X_AXIS3d * 10;
-    win.cam.znear = 0.1;
-    win.cam.zfar  = 200;
-    win.cam.up = Z_AXIS3d;
+    GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION / 1.777778);
+    win.cam.setPosition(X_AXIS3d * 10);
+    win.cam.setCenterOfInterest(ZERO_VEC3d);
+    win.cam.setNear(0.1);
+    win.cam.setFar(500);
+    win.cam.setUp(Z_AXIS3d);
     
     Manipulator manip(&win, &win.cam);
     AnimTimer timer(&win);
@@ -55,6 +55,7 @@ int main(int argc, char** argv) {
     Rect3d bnds = pc->bounds();
     double sz = (bnds.max() - bnds.min()).mag();
     win.scene.push_back(new VisTransformed(pc, scale(Vec3d(100 / sz)) * translation(-bnds.getCenter())));
+    win.scene.push_back(pc);
     
     win.setClearColor(Vec4d(0.11,0.11,0.11,1));
     

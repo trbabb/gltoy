@@ -2,6 +2,8 @@
 # and it's not reliable because the deps aren't really right
 # but oh well
 
+# todo: remove backwards boost static link dependency
+
 CC = g++
 LD = g++
 AR = ar
@@ -14,14 +16,13 @@ IFLAGS   = $(addprefix -I, $(INCLUDES))
 # link
 LIBDIRS  = /usr/local/boost/stage/lib \
            /System/Library/Frameworks/OpenGL.framework/Libraries
-LIBS     = geomc GL png z SDL_mixer GLU boost_system
+LIBS     = geomc GL png z GLU boost_system
 LDFLAGS  = $(addprefix -l, $(LIBS)) $(addprefix -L, $(LIBDIRS)) \
-           -framework GLUT -framework OpenGL \
-           `sdl-config --libs --cflags` \
+           -framework GLUT -framework OpenGL 
 
 # sources
 # not included right now: module `thruster`
-MODULES  = sound visible toolbox thruster
+MODULES  = visible toolbox thruster
 SRC      = $(wildcard src/*.cpp) \
            $(foreach m, $(MODULES), $(wildcard src/$(m)/*.cpp))
 OBJ      = $(patsubst src/%.cpp, build/%.o, $(SRC))
@@ -31,19 +32,20 @@ LIB      = lib/$(LIBNAME)
 
 # todo: see http://scottmcpeak.com/autodepend/autodepend.html
 
-all: lib sound occlusion
+all: lib random texture occlusion
 
 clean:
 	rm -rf ./build/*
 	rm -f ./lib/*.a
+	rm -f ./bin/*
 
 ## binaries
 
 random: $(OBJ) bindir build/scene/random.o
 	$(CC) $(LDFLAGS) $(OBJ) build/scene/random.o -o bin/random
 
-sound: $(OBJ) bindir build/scene/sound.o
-	$(CC) $(LDFLAGS) $(OBJ) build/scene/sound.o -o bin/sound
+texture: $(OBJ) bindir build/scene/texture.o
+	$(CC) $(LDFLAGS) $(OBJ) build/scene/texture.o -o bin/texture
 
 occlusion: $(OBJ) bindir build/scene/occlusion.o
 	$(CC) $(LDFLAGS) $(OBJ) build/scene/occlusion.o -o bin/occlusion
@@ -52,9 +54,9 @@ build/scene/random.o : src/scene/RandomScene.cpp
 	mkdir -p build/scene
 	$(CC) $(CFLAGS) $(IFLAGS) -o build/scene/random.o src/scene/RandomScene.cpp
 
-build/scene/sound.o : src/scene/SoundScene.cpp
+build/scene/texture.o : src/scene/TextureScene.cpp
 	mkdir -p build/scene
-	$(CC) $(CFLAGS) $(IFLAGS) -o build/scene/sound.o src/scene/SoundScene.cpp
+	$(CC) $(CFLAGS) $(IFLAGS) -o build/scene/texture.o src/scene/TextureScene.cpp
 
 build/scene/occlusion.o : src/scene/OcclusionScene.cpp
 	mkdir -p build/scene
