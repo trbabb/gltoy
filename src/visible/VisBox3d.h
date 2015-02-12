@@ -17,6 +17,7 @@ public:
 
 	VisBox3d(Vec3d c1, Vec3d c2);
 	VisBox3d(Rect3d box, bool wireframe=false);
+    VisBox3d(Rect2d box, bool wireframe=false);
 	virtual ~VisBox3d();
 
 	virtual void draw();

@@ -41,6 +41,22 @@ inline void glMultMatrix(const AffineTransform<double,3> &xf) {
     glMultMatrix(xf.mat);
 }
 
+// xxx do this properly.
+inline void glMultMatrix(const AffineTransform<double,2> &xf) {
+    SimpleMatrix<double,4,4> mat;
+    mat[0][0] = xf.mat[0][0];
+    mat[0][1] = xf.mat[0][1];
+    mat[1][0] = xf.mat[1][0];
+    mat[1][1] = xf.mat[1][1];
+    
+    mat[0][3] = xf.mat[0][2];
+    mat[1][3] = xf.mat[1][2];
+    
+    // todo: don't do a double matrix copy, that's stupid.
+    
+    glMultMatrix(mat);
+}
+
 /////////////// Load Matrix ///////////////
 
 inline void glLoadMatrix(const SimpleMatrix<double,4,4> &m) {

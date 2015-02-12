@@ -2,8 +2,6 @@
 # and it's not reliable because the deps aren't really right
 # but oh well
 
-# todo: remove backwards boost static link dependency
-
 CC = g++
 LD = g++
 AR = ar
@@ -14,9 +12,8 @@ CFLAGS   = -std=c++11 -O3 -Wall -c -fmessage-length=0 -Wno-unused -Wno-unused-lo
 IFLAGS   = $(addprefix -I, $(INCLUDES))
 
 # link
-LIBDIRS  = /usr/local/boost/stage/lib \
-           /System/Library/Frameworks/OpenGL.framework/Libraries
-LIBS     = geomc GL png z GLU boost_system
+LIBDIRS  = /System/Library/Frameworks/OpenGL.framework/Libraries
+LIBS     = geomc GL png z GLU #  boost_system
 LDFLAGS  = $(addprefix -l, $(LIBS)) $(addprefix -L, $(LIBDIRS)) \
            -framework GLUT -framework OpenGL 
 

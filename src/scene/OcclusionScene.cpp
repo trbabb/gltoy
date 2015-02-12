@@ -30,15 +30,15 @@
 int main(int argc, char** argv){
     GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION);
     Camera prepass_cam;
-    prepass_cam.setCenterOfInterest(ZERO_VEC3d);
     prepass_cam.setPosition(X_AXIS3d * 20);
+    prepass_cam.setCenterOfInterest(ZERO_VEC3d);
     prepass_cam.setNear(1);
     prepass_cam.setFar(1000);
     prepass_cam.setUp(Z_AXIS3d);
     
     Camera& cam = win.cam;
-    cam.setCenterOfInterest(Vec3d(0.5,0.5,0));
     cam.setPosition(Z_AXIS3d * 0.5 + cam.getCenterOfInterest());
+    cam.setCenterOfInterest(Vec3d(0.5,0.5,0));
     cam.setNear(0.1);
     Manipulator manip(&win, &prepass_cam); //manipulator will spin the pre-pass scene; not the card
     AnimTimer timer(&win);

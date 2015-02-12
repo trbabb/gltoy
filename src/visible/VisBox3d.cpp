@@ -30,6 +30,10 @@ VisBox3d::VisBox3d(Rect3d box, bool wireframe):Rect<double,3>(box),wireframe(wir
 	//do nothing else
 }
 
+VisBox3d::VisBox3d(Rect2d box, bool wireframe):Rect<double,3>(box.min().resized<3>(), box.max().resized<3>()), wireframe(wireframe){
+	//do nothing else
+}
+
 VisBox3d::~VisBox3d() {
 	//do nothing
 }

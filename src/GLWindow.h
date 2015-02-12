@@ -31,7 +31,7 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include <boost/thread.hpp>
+#include <mutex>
 
 #if __cplusplus <= 199711L
 #include <tr1/unordered_map>
@@ -59,7 +59,7 @@ private:
     };
     
     std::queue<PickEvt> picks;
-    boost::mutex pickMutex;
+    std::mutex pickMutex;
     double last_mdlmtx[16];
     double last_prjmtx[16];
     bool   mtx_valid;
