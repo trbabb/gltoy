@@ -27,7 +27,6 @@
 #define GLWINDOW_H_
 
 #include "glHeaders.h"
-#include <GLUT/glut.h>
 #include <vector>
 #include <queue>
 #include <string>

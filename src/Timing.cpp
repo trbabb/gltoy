@@ -3,6 +3,7 @@
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 
 #include <stdint.h>
+#include <cstddef>
 #include <sys/time.h>
 
 uint64_t local_epoch_start = 0;
@@ -16,7 +17,7 @@ double now() {
 
 #else
 
-#include <GLUT/glut.h>
+#include "glHeaders.h"
 
 double now() {
     return glutGet(GLUT_ELAPSED_TIME) / 1000.0;

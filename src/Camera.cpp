@@ -7,7 +7,6 @@
 
 #include "glHeaders.h"
 #include "glHelpers.h"
-#include <GLUT/glut.h>
 #include <geomc/linalg/AffineTransform.h>
 #include "Camera.h"
 

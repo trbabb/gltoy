@@ -5,7 +5,6 @@
  *      Author: tbabb
  */
 
-#include <GLUT/glut.h>
 #include "AnimTimer.h"
 #include "Timing.h"
 

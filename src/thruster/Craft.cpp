@@ -77,7 +77,7 @@ void Craft::draw(){
     
 	//create & draw crossbars
 	Vec3d a(1, 0.05, 0.05);
-	Vec3d b = a.swizzle("yxz");
+	Vec3d b(a.y, a.x, a.z);
 	VisBox3d xbar(-a, a);
 	VisBox3d ybar(-b, b);
 	VisBox3d ctrBox(-0.125 * ONE_VEC3d, 0.125 * ONE_VEC3d);
