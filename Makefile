@@ -2,13 +2,13 @@
 # and it's not reliable because the deps aren't really right
 # but oh well
 
-CC = g++
-LD = g++
+CC = clang++
+LD = clang++
 AR = ar
 
 # compile
 INCLUDES = src
-CFLAGS   = -std=c++11 -O3 -Wall -c -fmessage-length=0 -Wno-unused -Wno-unused-local-typedefs -Wno-deprecated-declarations -g
+CFLAGS   = -std=c++11 -O3 -Wall -c -fmessage-length=0 -Wno-deprecated-declarations -g
 IFLAGS   = $(addprefix -I, $(INCLUDES))
 
 # link

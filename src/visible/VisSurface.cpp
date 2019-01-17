@@ -65,7 +65,7 @@ void VisSurface::build(){
     //generate pt data
     for (int y = 0; y < dicing.y; y++){
         for (int x = 0; x < dicing.x; x++){
-            Vec2d st = sharedInfo->region.boxFraction(Vec2d(x,y) / dicingf);
+            Vec2d st = sharedInfo->region.remap(Vec2d(x,y) / dicingf);
             Vec3d pt = surface->eval(st);
             unsigned int vtx_num = (unsigned int)(dicing.x) * y + x;
             vtxData[3*vtx_num]   = pt.x;

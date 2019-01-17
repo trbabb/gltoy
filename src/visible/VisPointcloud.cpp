@@ -17,7 +17,7 @@ VisPointcloud::VisPointcloud(index_t npts, Vec3d *pts):
     std::copy(pts, pts+npts, points.get());
     
     for (index_t i = 0; i < npts; i++) {
-        bnd.extendTo(points[i]);
+        bnd |= points[i];
     }
 }
 

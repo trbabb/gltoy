@@ -177,16 +177,18 @@ Vec3d GLWindow::unprojectClickInValidContext(const Vec2d &p,
                                              double prjmtx[16],
                                              DepthCondition *cond) {
     Vec3d outpt;
-    float z;
+    float z[9];
+    float close = 1.0;
     int x = p.x + 0.5;
     int y = this->h - (p.y + 0.5);
     int vp[4] = {0,0,w,h};
     glReadBuffer(GL_FRONT);
-    glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
-    gluUnProject(x, y, z, mdlmtx, prjmtx, vp, &outpt.x, &outpt.y, &outpt.z);
-    if (z == 1) *cond      = DEPTH_FARPLANE;
-    else if (z == 0) *cond = DEPTH_NEARPLANE;
-    else *cond             = DEPTH_NONE;
+    glReadPixels(x-1, y-1, 3, 3, GL_DEPTH_COMPONENT, GL_FLOAT, z);
+    for (index_t i = 0; i < 9; i++) if (z[i] < close) close = z[i];
+    gluUnProject(x, y, close, mdlmtx, prjmtx, vp, &outpt.x, &outpt.y, &outpt.z); // xxx: no
+    if (close == 1)      *cond = DEPTH_FARPLANE;
+    else if (close == 0) *cond = DEPTH_NEARPLANE;
+    else                 *cond = DEPTH_NONE;
     return outpt;
 }
 
