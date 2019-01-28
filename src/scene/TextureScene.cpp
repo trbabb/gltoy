@@ -33,7 +33,7 @@ void splat(Image<float,1> img){
     Vec2f ctr = Vec2f(img.w()/2.0, img.h()/2.0);
     for (int y = 0; y < img.h(); y++){
         for (int x = 0; x < img.w(); x++){
-            Vec2f pt = Vec2d(x,y) - ctr;
+            Vec2f pt = Vec2f(x,y) - ctr;
             float mag = pt.mag() / (img.w()*0.5);
             mag = M_CLAMP(1-mag, 0.0f, 1.0f);
             img.set(x,y,mag*mag);

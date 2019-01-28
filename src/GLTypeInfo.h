@@ -19,4 +19,5 @@ public:
     static GLenum type;
 };
 
+
 #endif /* GLTYPEINFO_H_ */
