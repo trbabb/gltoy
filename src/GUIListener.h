@@ -13,6 +13,7 @@
 #define RIGHT_MOUSE_MASK  4
 
 #include <geomc/linalg/Vec.h>
+#include <geomc/shape/Rect.h>
 
 class GLWindow; //fwd decl
 
@@ -27,35 +28,43 @@ public:
 	GUIListener();
 	virtual ~GUIListener();
 
-	//a listener function shall return TRUE if it consumed the event successfully
+	// a listener function shall return TRUE if it consumed the event successfully.
+    // returning FALSE will allow other listeners to respond to the same event.
 	
 	/** 
 	 * Called when a mouse button is pressed or released
 	 *  - window: the window that generated the event
-	 *  - button: which button changed (one of GLUT_{LEFT,MIDDLE,RIGHT}_BUTTON)
-	 *  - state:  is the new button position down or up?
-	 *  - modifiers: which special keys are held down right now?
-	 *      bitwise OR of GLUT_ACTIVE_ALT, GLUT_ACTIVE_SHIFT, GLUT_ACTIVE_CTRL
-	 *  - x and y: position of event in the window.
+     *  - x, y: window coordinates of the event. These are not pixels!
+	 *  - button: which button changed (one of GLFW_MOUSE_BUTTON_{LEFT,MIDDLE,RIGHT}, or a numbered button).
+	 *  - down: whether the button was pressed (true) or released (false)
+	 *  - modifiers: bitflags for currently-pressed modifier keys; any of GLFW_MOD_{SHIFT,CONTROL,ALT,SUPER}
 	 */
-	virtual bool mouseEvent(GLWindow* window, int button, bool down, int modifiers, int x, int y);
+	virtual bool mouseEvent(GLWindow* window, double x, double y, int button, bool down, int modifiers);
 	
-	//Called when the mouse moves over the window
+	// Called when the mouse moves over the window
 	//  - window: the window that generated the event
-	//  - x, y: position of the cursor in the window (+y is up)
-	//  - buttons: which buttons are down now: {LEFT,MIDDLE,RIGHT}_MASK ?
-	virtual bool mouseMotion(GLWindow* window, int x, int y, int buttons);
+	//  - x, y: position of the cursor in window coordinates (+y is down). These are not pixels!
+    //  - button_masks: bitmasks representing press state for each button: {LEFT,MIDDLE,RIGHT}_MOUSE_MASK
+	virtual bool mouseMotion(GLWindow* window, double x, double y, int button_masks);
 	
-	//Called when a key is struck or released
-	//  - window: the window that generated the event
-	//  - key: ASCII character of keystroke, if exists. Sensitive to modifiers; i.e. "SHIFT + a" returns "A".
-	//  - keycode: integer GLUT code for a special, non-ascii key, like SHIFT or the arrowkeys. Mutually exclusive with <key>
-	//  - down: was the key just pressed, or released?
-	//  - special: was the keystroke a non-ascii key?
-	//  - x, y: position of the mouse cursor when the key was struck. +y is up.
-	virtual bool keyEvent(GLWindow* window, unsigned char key, int keycode, bool down, bool special, int x, int y);
+	// Called when a key is struck or released
+	//  - window: the window that generated the even
+	//  - keycode: a glfw key code
+	//  - down: whether the key was just struck (true) or released (false)
+	//  - mods: bitflags for modifier keys; any of GLFW_MOD_{SHIFT,CONTROL,ALT,SUPER}
+	virtual bool keyEvent(GLWindow* window, int keycode, bool down, int mods);
     
-    virtual bool windowReshaped(GLWindow *window, int w_new, int h_new);
+    // Called when a character is generated. Accounts for key modifiers like capslock, 
+    // shift; keyboard region; or special char input. Useful when you care about 
+    // the semantic meaning rather than the physical key.
+    virtual bool charEvent(GLWindow* window, unsigned int unicode_pt);
+    
+    // Called when the window changes dimension.
+    virtual bool windowReshaped(GLWindow* window, geom::Rect<double,2> window_shape);
+    
+    // Called when the window is requested to be closed.
+    // Return `false` if the window should not be closed.
+    virtual bool windowClosing(GLWindow* window);
 };
 
 class PickListener {

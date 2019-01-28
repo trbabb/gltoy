@@ -41,6 +41,7 @@ void Manipulator::_init(GLWindow* window, Camera *cam) {
     this->scale = window->cam.getDirection().mag();
     window->guiListeners.push_back(this);
     window->pickListeners.push_back(this);
+    this->window = window;
 }
 
 void Manipulator::computeOrientation(Camera &c, Vec3d &out_sph_coords, Quatd &axis_rotation) {
@@ -57,42 +58,43 @@ void Manipulator::updateCamera(Camera &c, Vec3d sph_coords, Quatd axis_to_z) {
     c.setPosition(cam_at + cam_look);
     c.setCenterOfInterest(cam_at);
     c.setUp(z_to_axis * rotated_up);
+    this->window->redraw();
 }
 
-bool Manipulator::mouseEvent(GLWindow* window, int button, bool down, int modifiers, int x, int y) {
-	Vec2d wincoords = Vec2d(x/(double)window->w, y/(double)window->h);
+bool Manipulator::mouseEvent(GLWindow* window, double x, double y, int button, bool down, int modifiers) {
+	Vec2d wincoords = window->window_shape.unmap(Vec2d(x,y));
 	clickPos[button] = wincoords;
-	if (button == GLUT_LEFT_BUTTON && down) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && down) {
 	    this->click_polar = this->cur_polar;
-	} else if (button == GLUT_RIGHT_BUTTON && down) {
+	} else if (button == GLFW_MOUSE_BUTTON_RIGHT && down) {
 	    this->click_polar.x = this->cur_polar.x;
         this->click_orthowidth = this->cam->getOrthoWidth();
 	}
 	return false;
 }
 
-bool Manipulator::mouseMotion(GLWindow* window, int x, int y, int buttons) {
-    Vec2d wincoords = Vec2d(x/(double)window->w, y/(double)window->h);
-    if (buttons & LEFT_MOUSE_MASK) {
-        Vec2d delt = this->clickPos[GLUT_LEFT_BUTTON] - wincoords;
+bool Manipulator::mouseMotion(GLWindow* window, double x, double y, int button_masks) {
+    Vec2d wincoords = window->window_shape.unmap(Vec2d(x,y));
+    bool updated = false;
+    if (button_masks & LEFT_MOUSE_MASK) {
+        Vec2d delt = this->clickPos[GLFW_MOUSE_BUTTON_LEFT] - wincoords;
         //polar == radius, elevation, azimuth about Z
         //todo: fmod
         this->cur_polar = this->click_polar + Vec3d(0, delt.y * 2.0 * PI, delt.x * 4.0 * PI);
+        updated = true;
     }
-    if (buttons & RIGHT_MOUSE_MASK) {
-        Vec2d delt = this->clickPos[GLUT_RIGHT_BUTTON] - wincoords;
+    if (button_masks & RIGHT_MOUSE_MASK) {
+        Vec2d delt = this->clickPos[GLFW_MOUSE_BUTTON_RIGHT] - wincoords;
         double scalefac = std::exp(delt.y * 2.3026);
         this->cur_polar.x = scalefac * this->click_polar.x;
         this->cam->setOrthoWidth(this->click_orthowidth * scalefac);
+        updated = true;
     }
-    this->cur_polar = this->cur_polar.clamp(Vec3d(0, 0, -INFINITY), Vec3d(INFINITY, PI, INFINITY));
-    updateCamera(*(this->cam), this->cur_polar, this->axis_to_z);
+    if (updated) {
+        this->cur_polar = this->cur_polar.clamp(Vec3d(0, 0, -INFINITY), Vec3d(INFINITY, PI, INFINITY));
+        updateCamera(*(this->cam), this->cur_polar, this->axis_to_z);
+    }
     
-	//do not consume the event
-	return false;
-}
-
-bool Manipulator::keyEvent(GLWindow* window, unsigned char key, int keycode, bool down, bool special, int x, int y) {
 	//do not consume the event
 	return false;
 }
@@ -109,7 +111,7 @@ bool Manipulator::pointPicked(GLWindow* window,
                               Vec3d world_pos,
                               DepthCondition cond) {
     const double DOUBLECLICK_THESHOLD_SECS = 0.25;
-    if (button == GLUT_LEFT){
+    if (button == GLFW_MOUSE_BUTTON_LEFT){
         if (evt_time - lastPickTime < DOUBLECLICK_THESHOLD_SECS && cond == DEPTH_NONE) {
             Vec3d dir = cam->getDirection();
             cam->setPosition(world_pos - dir);

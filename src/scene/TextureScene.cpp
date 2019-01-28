@@ -42,7 +42,7 @@ void splat(Image<float,1> img){
 }
 
 int main(int argc, char** argv){
-    GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION);
+    GLWindow win("OpenGL Toy Program", RESOLUTION, RESOLUTION);
     win.cam.setPosition(X_AXIS3d * 10);
     win.cam.setCenterOfInterest(ZERO_VEC3d);
     win.cam.setNear(0.1);

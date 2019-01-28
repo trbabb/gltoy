@@ -30,7 +30,7 @@ void setColor(Vec4d c) {
 }
 
 int main(int argc, char** argv) {
-    GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION / 1.777778);
+    GLWindow win("OpenGL Toy Program", RESOLUTION, RESOLUTION / 1.777778);
     win.cam.setPosition(X_AXIS3d * 10);
     win.cam.setCenterOfInterest(ZERO_VEC3d);
     win.cam.setNear(0.1);

@@ -13,9 +13,9 @@ IFLAGS   = $(addprefix -I, $(INCLUDES))
 
 # link
 LIBDIRS  = /System/Library/Frameworks/OpenGL.framework/Libraries
-LIBS     = geomc GL png z GLU #  boost_system
+LIBS     = geomc png z GLEW glfw
 LDFLAGS  = $(addprefix -l, $(LIBS)) $(addprefix -L, $(LIBDIRS)) \
-           -framework GLUT -framework OpenGL 
+           -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo 
 
 # sources
 # not included right now: module `thruster`

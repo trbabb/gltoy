@@ -24,12 +24,6 @@
 
 #include <vector>
 
-#if __cplusplus <= 199711L
-#include <tr1/unordered_map>
-#else
-#include <unordered_map>
-#endif
-
 #include "GLWindow.h"
 #include "Animated.h"
 
@@ -40,7 +34,6 @@ public:
 	double fps;
 	double t;
 	bool   running;
-	int    id;
 
 	AnimTimer(GLWindow* window, double fps=60);
 	virtual ~AnimTimer();
@@ -49,21 +42,10 @@ public:
 	void stop();
 
 protected:
-    
-#if __cplusplus <= 199711L
-    typedef std::tr1::unordered_map<int, AnimTimer*> timer_map_t;
-#else
-    typedef std::unordered_map<int, AnimTimer*> timer_map_t;
-#endif
-    
-	static timer_map_t timers_by_id;
-	static int max_id;
-
-	static AnimTimer* getTimer(int id);
-	static void timerCallback(int id);
 
 	void _doFrame(bool firstFrame=false);
-	void _registerId();
+	
+	friend void anim_timer_callback(void* payload);
 };
 
 #endif /* ANIMTIMER_H_ */

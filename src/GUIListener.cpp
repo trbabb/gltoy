@@ -15,24 +15,33 @@ GUIListener::~GUIListener() {
 	//virtual function; do nothing
 }
 
-bool GUIListener::mouseEvent(GLWindow* window, int button, bool down, int modifiers, int x, int y) {
+bool GUIListener::mouseEvent(GLWindow* window, double x, double y, int button, bool down, int modifiers) {
 	//do not consume the event
 	return false;
 }
 
-bool GUIListener::mouseMotion(GLWindow* window, int x, int y, int buttons) {
+bool GUIListener::mouseMotion(GLWindow* window, double x, double y, int button_masks) {
 	//do not consume the event
 	return false;
 }
 
-bool GUIListener::keyEvent(GLWindow* window, unsigned char key, int keycode, bool down, bool special, int x, int y) {
+bool GUIListener::keyEvent(GLWindow* window, int keycode, bool down, int mods) {
 	//do not consume the event
 	return false;
 }
 
-bool GUIListener::windowReshaped(GLWindow* window, int w_new, int h_new) {
+bool GUIListener::charEvent(GLWindow* window, unsigned int unicode_pt) {
+  return false;
+}
+
+bool GUIListener::windowReshaped(GLWindow* window, geom::Rect<double,2> window_shape) {
     // do not consume the event
     return false;
+}
+
+bool GUIListener::windowClosing(GLWindow* window) {
+  // allow the window to close by default
+  return true;
 }
 
 PickListener::PickListener() {}

@@ -28,7 +28,7 @@
 #define RESOLUTION 1024
 
 int main(int argc, char** argv){
-    GLWindow win(&argc, argv, "OpenGL Toy Program", RESOLUTION, RESOLUTION);
+    GLWindow win("OpenGL Toy Program", RESOLUTION, RESOLUTION);
     Camera prepass_cam;
     prepass_cam.setPosition(X_AXIS3d * 20);
     prepass_cam.setCenterOfInterest(ZERO_VEC3d);

@@ -22,9 +22,8 @@ public:
 	Manipulator(GLWindow* window);
 	virtual ~Manipulator();
 
-	virtual bool mouseEvent(GLWindow* window, int button, bool down, int modifiers, int x, int y);
-	virtual bool mouseMotion(GLWindow* window, int x, int y, int buttons);
-	virtual bool keyEvent(GLWindow* window, unsigned char keycode, int key, bool down, bool special, int x, int y);
+	virtual bool mouseEvent(GLWindow* window, double x, double y, int button, bool down, int modifiers);
+	virtual bool mouseMotion(GLWindow* window, double x, double y, int button_masks);
     virtual bool pointPicked(GLWindow *window, int button, int modifiers, 
                              double evt_time, Vec2d window_pos, Vec3d world_pos, DepthCondition cond);
     virtual void draw();
@@ -33,6 +32,7 @@ public:
 	void updateCamera(Camera &c, Vec3d sph_coords, Quatd axis_to_z);
 
 protected:
+    GLWindow* window;
 	Vec2d clickPos[6]; //indexed by button number. why are there six.
     double lastPickTime;
 	Camera* cam;

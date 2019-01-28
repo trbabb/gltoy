@@ -1,6 +1,9 @@
 #include "Timing.h"
 
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
+#if false && (defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)))
+
+// this stuff, I think, was intended to get a higher resolution timer.
+// now that we are on glfw, I think it's probably unnecessary
 
 #include <stdint.h>
 #include <cstddef>
@@ -20,7 +23,7 @@ double now() {
 #include "glHeaders.h"
 
 double now() {
-    return glutGet(GLUT_ELAPSED_TIME) / 1000.0;
+    return glfwGetTime();
 }
 
 #endif
