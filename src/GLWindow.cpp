@@ -22,6 +22,9 @@
 //      maybe a little abstract-y, but perhaps someday once this project becomes more complex.
 
 
+// xxx: picking doesn't work. coordinates are probably wrong.
+
+
 /****************************************
  * GLFW Callbacks                       *
  ****************************************/
@@ -204,7 +207,6 @@ void GLWindow::showAll() {
         // how long do we have to wait?
         if (delay > 0) {
             glfwWaitEventsTimeout(delay);
-            glfwWaitEvents();
         }
     }
 }
@@ -250,19 +252,10 @@ bool GLWindow::init() {
         global_init = true;
     }
     
-    // set window hints
-    
     // enable antialiasing:
     glfwWindowHint(GLFW_SAMPLES, 4);
-    // recommended for mac os:
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    // we use fixed function pipeline. enable compatibility.
-    // xxx this might be a problem: 
-    // https://www.khronos.org/opengl/wiki/OpenGL_Context#OpenGL_3.2_and_Profiles
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
     
     // create window
-    
     Vec2i dims = (Vec2i)(this->window_shape.getDimensions());
     this->window = glfwCreateWindow(dims.x, dims.y, winname.c_str(), nullptr, nullptr);
     if (not this->window) return false;
