@@ -266,6 +266,7 @@ bool GLWindow::init() {
     
     glfwSetFramebufferSizeCallback(this->window, glfw_window_resized);
     glfwSetWindowRefreshCallback(  this->window, glfw_window_needs_refresh);
+    glfwSetKeyCallback(            this->window, glfw_key_pressed);
     glfwSetCharCallback(           this->window, glfw_char_generated);
     glfwSetCursorPosCallback(      this->window, glfw_mouse_moved);
     glfwSetMouseButtonCallback(    this->window, glfw_mouse_button);

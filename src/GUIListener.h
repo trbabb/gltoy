@@ -49,7 +49,7 @@ public:
 	
 	// Called when a key is struck or released
 	//  - window: the window that generated the even
-	//  - keycode: a glfw key code
+	//  - keycode: a glfw key code (for letter keys, the code is just the corresponding character in caps)
 	//  - down: whether the key was just struck (true) or released (false)
 	//  - mods: bitflags for modifier keys; any of GLFW_MOD_{SHIFT,CONTROL,ALT,SUPER}
 	virtual bool keyEvent(GLWindow* window, int keycode, bool down, int mods);
