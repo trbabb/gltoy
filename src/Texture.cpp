@@ -19,7 +19,7 @@
  * Structors             *
  *************************/
 
-TexInfo::TexInfo():isBuilt(false){
+TexInfo::TexInfo():isBuilt(false), isLoaded(false) {
     //do nothing. dummy structor
 }
 
@@ -37,7 +37,8 @@ TexInfo::TexInfo(const GLvoid *data, int w, int h,
             min_filter(GL_LINEAR),
             mag_filter(GL_LINEAR),
             modulate(true),
-            isBuilt(false){}  //do nothing else.
+            isBuilt(false),
+            isLoaded(false) {}  //do nothing else.
 
 TexInfo::~TexInfo(){
     this->release();
@@ -48,8 +49,8 @@ TexInfo::~TexInfo(){
 Texture::Texture(int w, int h):
         _texinfo(new TexInfo(NULL, w, h, GL_RGB,
                 GL_RGB, GL_UNSIGNED_BYTE)),
-        _doMipmaps(false){
-    if (_doMipmaps){
+        _doMipmaps(false) {
+    if (_doMipmaps) {
         _texinfo->min_filter = GL_LINEAR_MIPMAP_LINEAR;
     }
 }
@@ -57,8 +58,8 @@ Texture::Texture(int w, int h):
 Texture::Texture(int w, int h, GLenum internalfmt, GLenum incomingFmt, bool doMipmaps):
             _texinfo(new TexInfo(NULL, w, h, internalfmt,
                 incomingFmt, GL_UNSIGNED_BYTE)),
-            _doMipmaps(doMipmaps){
-    if (_doMipmaps){
+            _doMipmaps(doMipmaps) {
+    if (_doMipmaps) {
         _texinfo->min_filter = GL_LINEAR_MIPMAP_LINEAR;
     }
 }
@@ -100,8 +101,10 @@ void Texture::use(){
     TexInfo &t = *this->_texinfo;
     glPushAttrib(GL_ENABLE_BIT | GL_TEXTURE_BIT);
     glEnable(GL_TEXTURE_2D);
-    if (!_texinfo->isBuilt){
+    if (not _texinfo->isBuilt){
         this->build();
+    } else if (not _texinfo->isLoaded) {
+        this->_reload();
     } else {
         glBindTexture(GL_TEXTURE_2D, t.id);
     }
@@ -119,6 +122,11 @@ void Texture::disable(){
     glPopAttrib();
 }
 
+void Texture::reload() {
+    // dirty the `loaded` state. reload on next use.
+    this->_texinfo->isLoaded = false;
+}
+
 void Texture::build(){
     TexInfo &t = *this->_texinfo;
     glGenTextures(1, &t.id);
@@ -129,12 +137,26 @@ void Texture::build(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, t.clamp_s);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, t.clamp_t);
     
+    this->reload();
+    
+    this->_texinfo->isBuilt = true;
+}
+
+
+void Texture::_reload() {
+    TexInfo& t = *this->_texinfo;
+    glBindTexture(GL_TEXTURE_2D, t.id);
     if (this->_doMipmaps){
         gluBuild2DMipmaps(GL_TEXTURE_2D, t.internalformat, t.w, t.h, t.datachannels, t.datatype, t.data);
     } else {
         glTexImage2D(GL_TEXTURE_2D, 0, t.internalformat, t.w, t.h, 0, t.datachannels, t.datatype, t.data);
     }
-    this->_texinfo->isBuilt = true;
+    this->_texinfo->isLoaded = true;
+}
+
+
+Vec<index_t,2> Texture::dimensions() const {
+    Vec<index_t,2>(this->_texinfo->w, this->_texinfo->h);
 }
 
 /*************************

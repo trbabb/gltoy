@@ -14,10 +14,16 @@
  * Type Info Helper      *
  *************************/
 
-template <typename T> class GlTypeInfo {
-public:
-    static GLenum type;
-};
+template <typename T> struct GlTypeInfo {};
+
+template <> struct GlTypeInfo<float>          { static GLenum type; };
+template <> struct GlTypeInfo<double>         { static GLenum type; };
+template <> struct GlTypeInfo<char>           { static GLenum type; };
+template <> struct GlTypeInfo<unsigned char>  { static GLenum type; };
+template <> struct GlTypeInfo<int>            { static GLenum type; };
+template <> struct GlTypeInfo<unsigned int>   { static GLenum type; };
+template <> struct GlTypeInfo<short>          { static GLenum type; };
+template <> struct GlTypeInfo<unsigned short> { static GLenum type; };
 
 
 #endif /* GLTYPEINFO_H_ */

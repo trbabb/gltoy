@@ -51,6 +51,7 @@ public:
     GLint mag_filter;
     GLint modulate;
     bool isBuilt;
+    bool isLoaded;
 };
 
 typedef boost::shared_ptr<TexInfo> TexInfoPtr;
@@ -65,9 +66,17 @@ public:
     Texture(int w, int h);
     Texture(int w, int h, GLenum internalfmt, GLenum incomingFmt, bool doMipmaps=true);
     
-    template <typename T, index_t N> Texture(Image<T,N> &img, GLenum internalfmt, bool doMipmaps=true){
+    template <typename T, index_t N> 
+    Texture(const Image<T,N>& img, GLenum internalfmt, bool doMipmaps=true) {
+        load(img, internalfmt, doMipmaps);
+    }
+    
+    virtual ~Texture();
+    
+    template <typename T, index_t N> 
+    void load(const Image<T,N>& img, GLenum internalfmt, bool doMipmaps=true) {
         int format; //how is the incoming data packed?
-        switch(N){
+        switch(N) {
             case 1:
                 if (internalfmt == GL_ALPHA || internalfmt == GL_ALPHA4 ||
                         internalfmt == GL_ALPHA8 || internalfmt == GL_ALPHA12 ||
@@ -93,15 +102,19 @@ public:
                 throw GraphicsException(ss.str());
         }
         GLenum datatype = GlTypeInfo<T>::type; //GL_INT? GL_FLOAT? etc.
-        _texinfo   = TexInfoPtr(new TexInfo((const GLvoid*)img.getRasterBuffer(), img.w(), img.h(), internalfmt, format, datatype));
+        _texinfo   = TexInfoPtr(new TexInfo((const GLvoid*)img.begin(), img.w(), img.h(), internalfmt, format, datatype));
         _doMipmaps = doMipmaps;
         
-        if (doMipmaps){
+        if (doMipmaps) {
             _texinfo->min_filter = GL_LINEAR_MIPMAP_LINEAR;
         }
     }
     
-    virtual ~Texture();
+    // get a pointer to the CPU-side image buffer.
+    // (call reload() after changing).
+    // it's on you to ask for the right type of data.
+    template <typename T>
+    T* data() { return (T*)_texinfo->data; }
     
     void setClamp(GLint mode);
     void setClamp(GLint mode_s, GLint mode_t);
@@ -109,12 +122,20 @@ public:
     void setMagFilter(GLint filter);
     void setModulate(bool modulate);
     GLuint getID();
+    Vec<index_t,2> dimensions() const;
     
+    // re-send the texture buffer data on next use (e.g. because you altered it.)
+    void reload();
+    // activate this texture for use
     void use();
+    // stop using this texture
     void disable();
+    // init this texture
     void build();
     
 private:
+    void _reload();
+    
     TexInfoPtr _texinfo;
     bool _doMipmaps;
 };

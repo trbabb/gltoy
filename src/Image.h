@@ -43,127 +43,125 @@ bool validate_png(std::istream &source);
  * Image class: T = type of pixel data; N = number of channels
  */
 template <typename T, index_t N> 
-class Image : public Expr<Vec2i, Vec<T,N> >{
-    int _w;
-    int _h;
-    boost::shared_array<T> data;
+class Image : public Expr<Vec2i, typename PointType<T,N>::point_t > {
+    
+    /// Type of one pixel in this image.
+    typedef typename PointType<T,N>::point_t pixel_t;
     
 public:
+    
+    int _w;
+    int _h;
+    boost::shared_array<pixel_t> data;
+    
+public:
+    
     Image(int w, int h):_w(w),_h(h){
-        data = boost::shared_array<T>(new T[N*_w*_h]);
+        data = boost::shared_array<pixel_t>(new pixel_t[_w * _h]);
         clear();
     }
     
     virtual ~Image(){
-        //data[] gets free'd automatically.
+        // data[] gets free'd automatically.
     }
     
-    //todo: eval/set functions which do not check, for private use.
+    // todo: eval/set functions which do not check, for private use.
+    
+    // get raw data (in pixel-contiguous order)
+    pixel_t* begin() {
+        return data.get();
+    }
+    
+    pixel_t* end() {
+        return data.get() + _w * _h;
+    }
+    
+    const pixel_t* begin() const {
+        return data.get();
+    }
+    
+    const pixel_t* end() const {
+        return data.get() + _w * _h;
+    }
 
-    Vec<T,N> eval(Vec2i pt){
+    // todo: should be const, but Expr does not declare it that way :|
+    pixel_t eval(Vec2i pt) {
         if (pt.x < 0 || pt.y < 0 || pt.x >= _w || pt.y >= _h){
-            return Vec<T,N>(); //zero
+            return pixel_t((T)0); // zero
         }
-        return Vec<T,N>( &(data[index(pt)]) );
+        return data[index(pt)];
     }
     
-    Vec<T,N> eval(int x, int y){
+    pixel_t eval(int x, int y) const {
         if (x < 0 || y < 0 || x >= _w || y >= _h){
-            return Vec<T,N>(); // zero
+            return pixel_t((T)0); // zero
         }
-        return Vec<T,N>( &(data[index(x,y)]));
+        return data[index(x, y)];
     }
     
-    void set(Vec2i pt, Vec<T,N> px){
+    void set(Vec2i pt, pixel_t px) {
         if (pt.x < 0 || pt.y < 0 || pt.x >= _w || pt.y >= _h){
             return;
         }
-        int idx = index(pt);
-        for (int i = 0; i < N; i++){
-            data[idx + i] = px[i];
-        }
+        data[index(pt)] = px;
     }
     
-    void set(int x, int y, Vec<T,N> px){
+    void set(int x, int y, pixel_t px) {
         if (x < 0 || y < 0 || x >= _w || y >= _h){
             return;
         }
-        int idx = index(x,y);
-        for (int i = 0; i < N; i++){
-            data[idx + i] = px[i];
-        }
+        data[index(x,y)] = px;
     }
     
-    void clear(){
-        for (int i = 0; i < _w*_h*N; i++){
-            data[i] = 0;
-        }
+    void clear() {
+        std::fill(begin(), end(), pixel_t((T)0));
     }
     
-    int w(){
+    int w() const {
         return this->_w;
     }
     
-    int h(){
+    int h() const {
         return this->_h;
     }
     
-    const T* getRasterBuffer(){
-        return this->data.get();
-    }
-    
     //TODO: implement filtering here. (not too hard.)
-    template <typename I> void fill(boost::shared_ptr< Expr< Vec<I,2>, Vec<T,N> > > expression,
-                Rect2d view, int pixelsamples=32){
+    template <typename I, typename U> 
+    void fill(
+            boost::shared_ptr< Expr< Vec<I,2>, U > > expression,
+            Rect2d view, 
+            int pixelsamples=32) {
         Vec2d dims = view.getDimensions();
         Vec2d dPixel = dims / Vec2d(_w,_h);
         Sampler<double> rv;
         for (int y = 0; y < _h; y++){
             for (int x = 0; x < _w; x++){
-                Vec<T,N> accum;
+                pixel_t accum;
                 for (int s = 0; s < pixelsamples; s++){
-                    Vec2d c1 = view.min() + dims*(Vec2d(x,y)/Vec2d(_w,_h));
+                    Vec2d c1 = view.min() + dims * (Vec2d(x,y) / Vec2d(_w, _h));
                     Vec2d c2 = c1 + dPixel;
                     Vec2d pt = rv.box(c1, c2);
-                    accum += expression->eval(Vec<I,2>(pt.x, pt.y));
+                    accum += pixel_t(expression->eval(Vec<I,2>(pt.x, pt.y)));
                 }
                 this->set(x, y, accum / pixelsamples);
             }
         }
     }
     
-    template <typename I> void fill(boost::shared_ptr< Expr< Vec<I,2>, T> > expression,
-                Rect2d view, int pixelsamples=32){
-        Vec2d dims = view.getDimensions();
-        Vec2d dPixel = dims / Vec2d(_w,_h);
-        Sampler<double> rv;
-        for (int y = 0; y < _h; y++){
-            for (int x = 0; x < _w; x++){
-                T accum = 0;
-                for (int s = 0; s < pixelsamples; s++){
-                    Vec2d c1 = view.min() + dims*(Vec2d(x,y)/Vec2d(_w,_h));
-                    Vec2d c2 = c1 + dPixel;
-                    Vec2d pt = rv.box(c1, c2);
-                    accum += expression->eval(Vec<I,2>(pt.x, pt.y));
-                }
-                this->set(x, y, Vec<T,N>(accum / pixelsamples));
-            }
-        }
-    }
-    
-    boost::shared_ptr< Expr< Vec2i, Vec<T,N> > > managedCopy(){
-        return boost::shared_ptr< Expr< Vec2i, Vec<T,N> > >(new Image<T,N>(*this));
+    // ugh, this crap is garbage. when can we get rid of it?
+    boost::shared_ptr< Expr< Vec2i, pixel_t > > managedCopy(){
+        return boost::shared_ptr< Expr< Vec2i, pixel_t > >(new Image<T,N>(*this));
     }
     
     virtual string opname() { return "image"; }
     
-    void sout(std::ostream& s){
+    void sout(std::ostream& s) {
         s << "Image (" << _w << " x " << _h << ", " << N << " channels)";
     }
     
     //todo: throw some exceptions
     //todo: auto-normalization (watch out for black images)
-    bool save_png(std::string path, Vec<T,N> white=(Vec<T,N>::ones), bool sixteenbit=false){
+    bool save_png(std::string path, pixel_t white=pixel_t((T)1), bool sixteenbit=false) const {
         int imgtype;
         switch (N){
             case 1:
@@ -203,34 +201,35 @@ public:
     
 protected:
     
-    int index(Vec2i pt){
+    int index(Vec2i pt) const {
         return index(pt.x, pt.y);
     }
     
-    int index(int x, int y){        
-        return (y*_w + x)*N;
+    int index(int x, int y) const {        
+        return y * _w + x;
     }
     
-    png_bytep* get_pngdata(Vec<T,N> white, bool sixteenbit){
-        png_bytep *rows = new png_bytep[_h];
-        for (int y = 0; y < _h; y++){
-            rows[y] = new png_byte[_w*N*(1+sixteenbit)];
+    png_bytep* get_pngdata(pixel_t white, bool sixteenbit) const {
+        png_bytep* rows = new png_bytep[_h];
+        T* white_p = PointType<T,N>::iterator(white);
+        for (int y = 0; y < _h; y++) {
+            rows[y] = new png_byte[_w * N * (1+sixteenbit)];
             for (int x = 0; x < _w; x++){
                 int src_idx = index(x,y);
-                //foreach channel:
-                for (int c = 0; c < N; c++){
-                    T val = data[src_idx+c];
-                    val = val < 0 ? 0 : (val > white[c] ? white[c] : val);
-                    if (sixteenbit){
-                        int ival = (val*0xffff)/white[c];
+                // foreach channel:
+                for (int c = 0; c < N; c++) {
+                    T val = PointType<T,N>::iterator(data[src_idx])[c];
+                    val = val < 0 ? 0 : (val > white_p[c] ? white_p[c] : val);
+                    if (sixteenbit) {
+                        int ival = (val * 0xffff) / white[c];
                         png_byte hi = (ival & 0xff00) >> 8;
                         png_byte lo =  ival & 0x00ff;
-                        //MSB first:
-                        rows[y][(x*N + c) * 2]     = hi;
-                        rows[y][(x*N + c) * 2 + 1] = lo;
+                        // MSB first:
+                        rows[y][(x * N + c) * 2]     = hi;
+                        rows[y][(x * N + c) * 2 + 1] = lo;
                     } else {
-                        png_byte b = (val*0xff)/white[c];
-                        rows[y][x*N + c] = b;
+                        png_byte b = (val * 0xff) / white_p[c];
+                        rows[y][x * N + c] = b;
                     }
                 }
             }
