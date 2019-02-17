@@ -41,6 +41,7 @@ void glfw_window_resized(GLFWwindow* window, int width, int height) {
     GLWindow* win = (GLWindow*) glfwGetWindowUserPointer(window);
     if (win) {
         win->reshaped(w,h);
+        win->redraw();
     }
 }
 
@@ -292,7 +293,10 @@ bool GLWindow::init() {
     glEnable(GL_MULTISAMPLE);
     
     // set up the viewport
-    this->reshaped(dims.x, dims.y);
+    // we query the size because the OS may have squished it to fit onscreen.
+    int w, h;
+    glfwGetFramebufferSize(this->window, &w, &h);
+    this->reshaped(w, h);
     
     // now we're ready to accept refresh callbacks
     this->needs_redraw = true;
