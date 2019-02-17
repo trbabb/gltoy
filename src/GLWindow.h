@@ -105,10 +105,10 @@ protected:
     
     void  draw();
     void  processPicks();
-    Vec3d unprojectClickInValidContext(const Vec2d &p, 
-                                       double mdlmtx[16], 
-                                       double prjmtx[16], 
-                                       DepthCondition *cond);
+    void  makeCurrent();
+    Vec3d unprojectClickInValidContext(
+        const Vec2d &p,
+        DepthCondition *cond);
 
 };
 

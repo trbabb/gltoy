@@ -73,6 +73,11 @@ public:
     
     virtual ~Texture();
     
+    // are you having trouble with empty-looking textures?
+    // many graphics cards do not support double textures. in this case, your texture
+    // will be white in spite of everything else being right. try converting to single precision
+    // floats and try again if this is your situation. wouldn't it be nice if opengl would
+    // error in this case? yeah, it would, wouldn't it.
     template <typename T, index_t N> 
     void load(const Image<T,N>& img, GLenum internalfmt, bool doMipmaps=true) {
         int format; //how is the incoming data packed?
@@ -137,7 +142,7 @@ private:
     void _reload();
     
     TexInfoPtr _texinfo;
-    bool _doMipmaps;
+    bool       _doMipmaps;
 };
 
 #endif /* TEXTURE_H_ */

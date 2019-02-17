@@ -22,9 +22,6 @@
 //      maybe a little abstract-y, but perhaps someday once this project becomes more complex.
 
 
-// xxx: picking doesn't work. coordinates are probably wrong.
-
-
 /****************************************
  * GLFW Callbacks                       *
  ****************************************/
@@ -57,9 +54,12 @@ void glfw_window_needs_refresh(GLFWwindow* window) {
 void glfw_key_pressed(GLFWwindow* window, int key, int scancode, int action, int mods) {
     GLWindow* win = (GLWindow*) glfwGetWindowUserPointer(window);
     if (win) {
-        if (action == GLFW_REPEAT) return; // discard these events.
+        if (false and action == GLFW_REPEAT) {
+            // action = GLFW_PRESS;
+            return; // discard these events.
+        }
         for (unsigned int i = 0; i < win->guiListeners.size(); i++){
-            bool consume = win->guiListeners[i]->keyEvent(win, key, action == GLFW_PRESS, mods);
+            bool consume = win->guiListeners[i]->keyEvent(win, key, action == GLFW_PRESS or action == GLFW_REPEAT, mods);
             if (consume) break;
         }
     }
@@ -110,6 +110,7 @@ void glfw_mouse_button(GLFWwindow* window, int button, int action, int mods) {
             GLWindow::PickEvt e = { Vec2d(x, y), t, button, mods };
             win->picks.push(e);
             win->pickMutex.unlock();
+            win->processPicks();
         }
     }
 }
@@ -163,7 +164,7 @@ void postTimerCallback(double delay_seconds, void (*callback)(void*), void* payl
 void GLWindow::showAll() {
     while (all_windows.size() > 0) {
         
-        // check all windows for redraw requests
+        // check all windows for close events; redraw requests
         for (auto i = all_windows.begin(); i != all_windows.end(); /* post-increment within loop */) {
             GLWindow* glwin = *i;
             // close the window if necessary
@@ -176,7 +177,11 @@ void GLWindow::showAll() {
                     continue;
                 }
             }
-            // window was not closed; redraw if necessary
+            // window was not closed
+            // handle picks before redrawing, as pick-handling migh affect what we draw.
+            glwin->processPicks();
+            
+            // redraw if necessary
             if (glwin->needs_redraw) {
                 glwin->draw();
             }
@@ -219,16 +224,16 @@ void GLWindow::showAll() {
 
 GLWindow::GLWindow():
         winname("OpenGL_App"),
-		window_shape(Vec2d(), Vec2d(800, 600)),
+        window_shape(Vec2d(), Vec2d(800, 600)),
         cam(800 / (double)600){
     init();
 }
 
 GLWindow::GLWindow(std::string name, int w, int h):
-		winname(name),
+        winname(name),
         window_shape(Vec2d(), Vec2d(w, h)),
         cam(w / (double)h) {
-	init();
+    init();
 }
 
 GLWindow::~GLWindow() {
@@ -243,8 +248,8 @@ GLWindow::~GLWindow() {
 
 bool GLWindow::init() {
     mtx_valid    = false;
-	depthTest    = true;
-	clearBuffers = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+    depthTest    = true;
+    clearBuffers = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
     
     if (not global_init) {
         if (not glfwInit()) { return false; }
@@ -280,11 +285,11 @@ bool GLWindow::init() {
     // init extensions
     glewExperimental = true;
     if (glewInit() != GLEW_OK) return false;
-	
+    
     // necessary even after giving above multisample hint. 
     // the hint gives us a multisample-capable buffer;
     // this call actually enables multisampling.
-	glEnable(GL_MULTISAMPLE);
+    glEnable(GL_MULTISAMPLE);
     
     // set up the viewport
     this->reshaped(dims.x, dims.y);
@@ -332,40 +337,31 @@ void GLWindow::draw(){
     // no draw if bogus context kthx
     if (not this->window) return;
     
-    // make context current
-    if (glfwGetCurrentContext() != this->window) {
-        glfwMakeContextCurrent(this->window);
-        // this needs to be called on every context change.
-        // not necessary for mac/linux, but needed on windows.
-        // (not dangerous to call more than once otherwise).
-        glewInit();
-    }
+    makeCurrent();
     
     //render pre-passes
     for (unsigned int i = 0; i < prePasses.size(); i++){
         prePasses[i]->render();
     }
     
-    processPicks();
-    
     //render the main pass
-	if (depthTest){
-		glEnable(GL_DEPTH_TEST);
-	}
-	glClearColor(clear_clr.x, clear_clr.y, clear_clr.z, clear_clr.w);
-	glClear(clearBuffers);
-	cam.use();
+    if (depthTest){
+        glEnable(GL_DEPTH_TEST);
+    }
+    glClearColor(clear_clr.x, clear_clr.y, clear_clr.z, clear_clr.w);
+    glClear(clearBuffers);
+    cam.use();
     
     glGetDoublev(GL_MODELVIEW_MATRIX,  last_mdlmtx);
     glGetDoublev(GL_PROJECTION_MATRIX, last_prjmtx);
     mtx_valid = true;
     
-	for (unsigned int i = 0; i < scene.size(); i++){
-		Drawable* d = scene[i];
-		d->draw();
-	}
-	cam.disable();
-	glfwSwapBuffers(this->window);
+    for (unsigned int i = 0; i < scene.size(); i++){
+        Drawable* d = scene[i];
+        d->draw();
+    }
+    cam.disable();
+    glfwSwapBuffers(this->window);
 }
 
 
@@ -409,12 +405,14 @@ void GLWindow::processPicks() {
         return;
     }
     
+    makeCurrent();
+    
     pickMutex.lock();
     while (not picks.empty()) {
         PickEvt evt = picks.front();
         picks.pop();
         DepthCondition cond;
-        Vec3d pt = unprojectClickInValidContext(evt.pt, last_mdlmtx, last_prjmtx, &cond);
+        Vec3d pt = unprojectClickInValidContext(evt.pt, &cond);
         for (auto i = pickListeners.begin(); i != pickListeners.end(); i++) {
             if ((*i)->pointPicked(this, evt.button, evt.mods, evt.time, evt.pt, pt, cond)) break;
         }
@@ -422,11 +420,19 @@ void GLWindow::processPicks() {
     pickMutex.unlock();
 }
 
+void GLWindow::makeCurrent() {
+    if (glfwGetCurrentContext() != this->window) {
+        glfwMakeContextCurrent(this->window);
+        // this needs to be called on every context change.
+        // not necessary for mac/linux, but needed on windows.
+        // (not dangerous to call more than once otherwise).
+        glewInit();
+    }
+}
 
-Vec3d GLWindow::unprojectClickInValidContext(const Vec2d &p, 
-                                             double mdlmtx[16],
-                                             double prjmtx[16],
-                                             DepthCondition* cond) {
+Vec3d GLWindow::unprojectClickInValidContext(
+        const Vec2d &window_pt,
+        DepthCondition* cond) {
     Vec3d outpt;
     int w, h;
     float z[9];
@@ -434,7 +440,8 @@ Vec3d GLWindow::unprojectClickInValidContext(const Vec2d &p,
     // convert click coordinates (window space) to pixel coordinates
     glfwGetFramebufferSize(this->window, &w, &h);
     Rect<double,2> buffer_shape(Vec2d(), Vec2d(w, h));
-    Vec2d win_coord = this->window_shape.unmap(p);
+    Vec2d win_coord = this->window_shape.unmap(window_pt);
+    win_coord.y     = 1 - win_coord.y; // buffer is y-down.
     Vec2i buf_coord = (Vec2i)(buffer_shape.remap(win_coord) + Vec2d(0.5));
     
     glReadBuffer(GL_FRONT);
@@ -455,10 +462,12 @@ Vec3d GLWindow::unprojectClickInValidContext(const Vec2d &p,
     // to record the pixel from whence our depth came and unproject from there, 
     // as if we had clicked it.
     int vp[4] = { 0, 0, w, h };
-    gluUnProject(buf_coord.x, buf_coord.x, nearest, mdlmtx, prjmtx, vp, &outpt.x, &outpt.y, &outpt.z);
+    gluUnProject(buf_coord.x, buf_coord.y, nearest, last_mdlmtx, last_prjmtx, vp, &outpt.x, &outpt.y, &outpt.z);
     if      (nearest == 1) *cond = DEPTH_FARPLANE;
     else if (nearest == 0) *cond = DEPTH_NEARPLANE;
     else                   *cond = DEPTH_NONE;
+    
+    
     return outpt;
 }
 

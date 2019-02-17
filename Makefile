@@ -47,6 +47,12 @@ texture: $(OBJ) bindir build/scene/texture.o
 occlusion: $(OBJ) bindir build/scene/occlusion.o
 	$(CC) $(LDFLAGS) $(OBJ) build/scene/occlusion.o -o bin/occlusion
 
+perlin: $(OBJ) bindir build/scene/Perlin.o
+	$(CC) $(LDFLAGS) $(OBJ) build/scene/Perlin.o -o bin/perlin
+
+pick: $(OBJ) bindir build/scene/PickerScene.o
+	$(CC) $(LDFLAGS) $(OBJ) build/scene/PickerScene.o -o bin/pick
+
 build/scene/random.o : src/scene/RandomScene.cpp
 	mkdir -p build/scene
 	$(CC) $(CFLAGS) $(IFLAGS) -o build/scene/random.o src/scene/RandomScene.cpp

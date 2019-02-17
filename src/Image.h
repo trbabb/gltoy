@@ -86,13 +86,10 @@ public:
 
     // todo: should be const, but Expr does not declare it that way :|
     pixel_t eval(Vec2i pt) {
-        if (pt.x < 0 || pt.y < 0 || pt.x >= _w || pt.y >= _h){
-            return pixel_t((T)0); // zero
-        }
-        return data[index(pt)];
+        return eval(pt.x, pt.y);
     }
     
-    pixel_t eval(int x, int y) const {
+    inline pixel_t eval(int x, int y) const {
         if (x < 0 || y < 0 || x >= _w || y >= _h){
             return pixel_t((T)0); // zero
         }
@@ -100,17 +97,14 @@ public:
     }
     
     void set(Vec2i pt, pixel_t px) {
-        if (pt.x < 0 || pt.y < 0 || pt.x >= _w || pt.y >= _h){
-            return;
-        }
-        data[index(pt)] = px;
+        set(pt.x, pt.y, px);
     }
     
-    void set(int x, int y, pixel_t px) {
+    inline void set(int x, int y, pixel_t px) {
         if (x < 0 || y < 0 || x >= _w || y >= _h){
             return;
         }
-        data[index(x,y)] = px;
+        data[index(x, y)] = px;
     }
     
     void clear() {

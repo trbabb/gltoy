@@ -137,8 +137,13 @@ void Texture::build(){
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, t.clamp_s);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, t.clamp_t);
     
-    this->reload();
+    if (this->_doMipmaps){
+        gluBuild2DMipmaps(GL_TEXTURE_2D, t.internalformat, t.w, t.h, t.datachannels, t.datatype, t.data);
+    } else {
+        glTexImage2D(GL_TEXTURE_2D, 0, t.internalformat, t.w, t.h, 0, t.datachannels, t.datatype, t.data);
+    }
     
+    this->_texinfo->isLoaded = true;
     this->_texinfo->isBuilt = true;
 }
 
@@ -146,17 +151,18 @@ void Texture::build(){
 void Texture::_reload() {
     TexInfo& t = *this->_texinfo;
     glBindTexture(GL_TEXTURE_2D, t.id);
-    if (this->_doMipmaps){
+    if (this->_doMipmaps) {
         gluBuild2DMipmaps(GL_TEXTURE_2D, t.internalformat, t.w, t.h, t.datachannels, t.datatype, t.data);
     } else {
-        glTexImage2D(GL_TEXTURE_2D, 0, t.internalformat, t.w, t.h, 0, t.datachannels, t.datatype, t.data);
+        // this avoids re-allocating internal data structures:
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, t.w, t.h, t.datachannels, t.datatype, t.data) ;
     }
     this->_texinfo->isLoaded = true;
 }
 
 
 Vec<index_t,2> Texture::dimensions() const {
-    Vec<index_t,2>(this->_texinfo->w, this->_texinfo->h);
+    return Vec<index_t,2>(this->_texinfo->w, this->_texinfo->h);
 }
 
 /*************************
